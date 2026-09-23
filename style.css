@@ -145,6 +145,19 @@ header p {
 /* ========================= */
 
 .volcano-data {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px 24px;
+    pointer-events: none;
     transition: opacity 0.4s ease, transform 0.4s ease;
     opacity: 1;
 }
@@ -155,31 +168,37 @@ header p {
     pointer-events: none !important;
 }
 
+.volcano-data::-webkit-scrollbar {
+    width: 5px;
+}
+
+.volcano-data::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.volcano-data::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+}
+
 
 /* ========================= */
-/* CONTROLS                  */
+/* CONTROLS (FACTS & PARTS)  */
 /* ========================= */
 
 .controls {
-
-    position: absolute;
-
-    left: 10px;
-    right: 10px;
-
-    bottom: 170px;
-
-    max-width: 500px;
-
-    margin: auto;
-
-    padding: 12px;
-
-    background: rgba(0, 0, 0, 0.70);
-
-    border-radius: 15px;
-
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px;
+    background: rgba(10, 15, 30, 0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
     pointer-events: auto;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .controls h2 {
@@ -261,25 +280,18 @@ button {
 /* ========================= */
 
 .quiz {
-
-    position: absolute;
-
-    left: 10px;
-    right: 10px;
-
-    bottom: 10px;
-
-    max-width: 500px;
-
-    margin: auto;
-
-    padding: 12px;
-
-    background: rgba(0, 0, 0, 0.82);
-
-    border-radius: 15px;
-
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px;
+    background: rgba(10, 15, 30, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
     pointer-events: auto;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .quiz h2 {
@@ -302,7 +314,7 @@ button {
 
     width: 100%;
 
-    margin: 5px 0;
+    margin: 6px 0;
 
     background: white;
 
