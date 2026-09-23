@@ -1,0 +1,196 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #0f0f13;
+    color: #ffffff;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+header {
+    padding: 20px 15px 10px;
+    background: linear-gradient(180deg, rgba(20, 20, 30, 0.9) 0%, rgba(15, 15, 19, 0) 100%);
+}
+
+header h1 {
+    margin: 0 0 5px;
+    font-size: 1.8rem;
+    color: #ff6b4a;
+    text-shadow: 0 2px 10px rgba(255, 107, 74, 0.3);
+}
+
+header p {
+    margin: 0;
+    color: #aaa;
+    font-size: 0.95rem;
+}
+
+model-viewer {
+    width: 100%;
+    height: 450px;
+    background: #181820;
+    position: relative;
+}
+
+.ar-button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 14px 28px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #ff5e3a, #ff2a6d);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 42, 109, 0.4);
+    z-index: 100;
+    pointer-events: auto;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ar-button:active {
+    transform: translateX(-50%) scale(0.96);
+}
+
+/* WebXR DOM Overlay styling */
+model-viewer [slot="ar-overlay"],
+.ar-overlay-container {
+    display: block !important;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 15px;
+    pointer-events: none;
+    /* Allows 3D model touch interactions around UI cards */
+    box-sizing: border-box;
+}
+
+/* Ensure interactive children respond to clicks/taps */
+.ar-overlay-container section,
+.ar-overlay-container button,
+.ar-overlay-container div {
+    pointer-events: auto;
+}
+
+.controls,
+.quiz {
+    background: rgba(26, 26, 36, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    margin: 15px auto;
+    padding: 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    text-align: left;
+}
+
+.controls h2,
+.quiz h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    color: #ffa07a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+button {
+    padding: 12px 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.button-grid button {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.button-grid button:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.98);
+}
+
+.eruption {
+    margin-top: 14px;
+    width: 100%;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+}
+
+.eruption:active {
+    transform: scale(0.98);
+}
+
+#info {
+    margin-top: 14px;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 4px solid #ff6b4a;
+    border-radius: 8px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+}
+
+.quiz button {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.07);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: left;
+}
+
+.quiz button:active {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+#quiz-result {
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 12px;
+    min-height: 24px;
+}
+
+/* Eruption shake animation */
+body.eruption-active model-viewer {
+    animation: shake 0.15s infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    100% {
+        transform: translateX(-5px);
+    }
+}

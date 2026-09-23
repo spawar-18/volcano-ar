@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Volcano Explorer</title>
+
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🌋 AR Volcano Explorer</h1>
+        <p>Explore, learn and discover how volcanoes erupt.</p>
+    </header>
+
+    <model-viewer src="volcano_model.glb" ar ar-modes="webxr" camera-controls shadow-intensity="1" auto-rotate
+        alt="Interactive 3D Volcano">
+
+        <button slot="ar-button" class="ar-button">
+            📱 View Volcano in AR
+        </button>
+
+        <!-- WebXR DOM Overlay UI -->
+        <div slot="ar-overlay" id="ar-overlay-container" class="ar-overlay-container">
+
+            <section class="controls">
+                <h2>🔎 Explore the Volcano</h2>
+
+                <div class="button-grid">
+                    <button onclick="showInfo('crater')">🕳️ Crater</button>
+                    <button onclick="showInfo('magma')">🔥 Magma</button>
+                    <button onclick="showInfo('lava')">🌋 Lava</button>
+                    <button onclick="showInfo('ash')">💨 Ash & Gas</button>
+                </div>
+
+                <button class="eruption" onclick="erupt()">🌋 START ERUPTION</button>
+
+                <div id="info">
+                    👆 Tap a volcano part above to learn about it.
+                </div>
+            </section>
+
+            <section class="quiz">
+                <h2>🧠 Quick Volcano Quiz</h2>
+                <p id="question">What is magma?</p>
+
+                <button onclick="answer(false)">A. Volcanic ash</button>
+                <button onclick="answer(true)">B. Molten rock beneath Earth's surface</button>
+                <button onclick="answer(false)">C. Hardened lava</button>
+
+                <p id="quiz-result"></p>
+            </section>
+
+        </div>
+
+    </model-viewer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
