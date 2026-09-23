@@ -2,441 +2,350 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: #0a0a0f;
-    color: #ffffff;
-    text-align: center;
-    overflow-x: hidden;
-    min-height: 100vh;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    font-family: Arial, sans-serif;
 }
 
+
+/* ========================= */
+/* AR CAMERA                 */
+/* ========================= */
+
+a-scene {
+    position: fixed !important;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 0;
+}
+
+
+/* ========================= */
+/* EDUCATIONAL UI            */
+/* ========================= */
+
+#ar-ui {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 10;
+
+    pointer-events: none;
+
+    color: white;
+
+    text-align: center;
+}
+
+
+/* Header */
+
 header {
-    padding: 20px 15px 12px;
-    background: linear-gradient(180deg, rgba(20, 20, 32, 0.95) 0%, rgba(10, 10, 15, 0) 100%);
+
+    padding: 12px;
+
+    background: rgba(0, 0, 0, 0.75);
+
+    pointer-events: none;
 }
 
 header h1 {
-    margin: 0 0 6px;
-    font-size: 1.9rem;
-    color: #ff6b4a;
-    text-shadow: 0 2px 12px rgba(255, 107, 74, 0.4);
-    letter-spacing: -0.5px;
+
+    margin: 0;
+
+    font-size: 22px;
 }
 
 header p {
-    margin: 0;
-    color: #b0b0cc;
-    font-size: 0.95rem;
+
+    margin: 5px 0 0;
+
+    font-size: 13px;
+    color: #ffcc80;
 }
 
-.main-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 12px 20px;
-}
 
-.viewer-wrapper {
-    position: relative;
-    width: 100%;
-    border-radius: 20px;
-    overflow: hidden;
-}
+/* ========================= */
+/* SCANNING GUIDE PROMPT     */
+/* ========================= */
 
-model-viewer {
-    width: 100%;
-    height: 520px;
-    background: radial-gradient(circle at center, #1b1b26 0%, #0d0d14 100%);
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-}
-
-.ar-button {
+.scan-prompt {
     position: absolute;
-    bottom: 24px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    padding: 14px 28px;
-    border: none;
-    border-radius: 30px;
-    background: linear-gradient(135deg, #ff5e3a, #ff2a6d);
-    color: white;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 22px rgba(255, 42, 109, 0.55);
-    z-index: 100;
-    pointer-events: auto;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
-}
-
-.ar-button:hover,
-.ar-button:focus {
-    transform: translateX(-50%) scale(1.04);
-    box-shadow: 0 6px 28px rgba(255, 42, 109, 0.75);
-}
-
-.ar-button:active {
-    transform: translateX(-50%) scale(0.96);
-}
-
-/* =========================================================
-   WebXR DOM Overlay HUD Styling (Camera View & 2D)
-   ========================================================= */
-
-/* Default container styles */
-.ar-overlay-container {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
-
-/* Standard 2D Page View mode */
-.ar-overlay-container.mode-2d {
-    position: relative;
-    width: 100%;
-    margin-top: 16px;
-    padding: 0;
-    pointer-events: auto;
-}
-
-/* WebXR AR Camera View mode */
-.ar-overlay-container.mode-ar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 14px;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 40px);
+    max-width: 360px;
     pointer-events: none;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    z-index: 9999;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 20;
 }
 
-/* Restore pointer-events for interactive children in AR mode */
-.ar-overlay-container.mode-ar button,
-.ar-overlay-container.mode-ar section,
-.ar-overlay-container.mode-ar .ar-hud-nav {
-    pointer-events: auto;
-}
-
-/* Ensure slot="ar-overlay" mount container is visible when active */
-model-viewer [slot="ar-overlay"] {
-    display: flex !important;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+.scan-prompt.hidden {
+    opacity: 0;
     pointer-events: none;
-}
-
-/* Interactive elements in HUD receive touches */
-.ar-overlay-container button,
-.ar-overlay-container section,
-.ar-overlay-container div {
-    pointer-events: auto;
-}
-
-/* AR Top HUD Navigation Bar */
-.ar-hud-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin: 0 auto 12px auto;
-    background: rgba(18, 18, 28, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    padding: 6px;
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-    max-width: 440px;
-    width: 100%;
-}
-
-.nav-tab {
-    flex: 1;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 22px;
-    background: transparent;
-    color: #b0b0d0;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.nav-tab.active {
-    background: linear-gradient(135deg, #ff5e3a, #ff2a6d);
-    color: #ffffff;
-    box-shadow: 0 3px 14px rgba(255, 42, 109, 0.5);
-}
-
-.hud-toggle-btn {
-    padding: 10px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.hud-toggle-btn:active {
-    background: rgba(255, 255, 255, 0.25);
-}
-
-/* Glassmorphism HUD Card Containers */
-.hud-card {
     display: none;
-    background: rgba(18, 18, 28, 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 20px;
-    padding: 18px;
-    margin: 0 auto 12px auto;
-    max-width: 460px;
-    width: 100%;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
-    text-align: left;
-    color: white;
-    animation: fadeInSlide 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-.hud-card.active {
-    display: block;
+.scan-card {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 112, 67, 0.4);
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-.hud-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    padding-bottom: 10px;
-    margin-bottom: 14px;
+.scan-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+    animation: marker-pulse 1.8s infinite ease-in-out;
 }
 
-.hud-card-header h2 {
+@keyframes marker-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.15); opacity: 1; }
+}
+
+.scan-card h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    color: #ff7043;
+}
+
+.scan-card p {
     margin: 0;
-    font-size: 1.15rem;
-    color: #ffa07a;
-    font-weight: 700;
-}
-
-@keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Explorer Feature Grid */
-.button-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.feature-btn {
-    padding: 12px 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    font-size: 13.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.feature-btn:hover {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 107, 74, 0.5);
-}
-
-.feature-btn:active {
-    transform: scale(0.97);
-    background: rgba(255, 94, 58, 0.3);
-}
-
-.eruption-btn {
-    margin-top: 14px;
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #ff416c, #ff4b2b);
-    color: white;
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    box-shadow: 0 4px 18px rgba(255, 75, 43, 0.45);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.eruption-btn:active {
-    transform: scale(0.97);
-}
-
-.info-box {
-    margin-top: 14px;
-    padding: 14px;
-    background: rgba(0, 0, 0, 0.45);
-    border-left: 4px solid #ff6b4a;
-    border-radius: 10px;
+    font-size: 14px;
     line-height: 1.5;
-    font-size: 0.92rem;
-    color: #e0e0e0;
+    color: #e2e8f0;
 }
 
-/* Quiz UI Styling */
-.quiz-badge {
-    background: rgba(255, 42, 109, 0.25);
-    color: #ff6b4a;
-    border: 1px solid rgba(255, 107, 74, 0.4);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
+
+/* ========================= */
+/* VOLCANO DATA VISIBILITY   */
+/* ========================= */
+
+.volcano-data {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    opacity: 1;
 }
 
-.quiz-question {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 14px 0;
-    color: #f0f0f5;
-    line-height: 1.4;
+.volcano-data.hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none !important;
 }
 
-.quiz-options-grid {
-    display: flex;
-    flex-direction: column;
+
+/* ========================= */
+/* CONTROLS                  */
+/* ========================= */
+
+.controls {
+
+    position: absolute;
+
+    left: 10px;
+    right: 10px;
+
+    bottom: 170px;
+
+    max-width: 500px;
+
+    margin: auto;
+
+    padding: 12px;
+
+    background: rgba(0, 0, 0, 0.70);
+
+    border-radius: 15px;
+
+    pointer-events: auto;
+}
+
+.controls h2 {
+
+    margin: 0 0 10px;
+
+    font-size: 18px;
+}
+
+
+/* Buttons */
+
+.button-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
     gap: 8px;
 }
 
-.quiz-option-btn {
-    padding: 12px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.07);
-    color: #ffffff;
-    font-size: 13.5px;
-    font-weight: 500;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-}
+button {
 
-.quiz-option-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-}
+    border: none;
 
-.quiz-option-btn.correct-opt {
-    background: rgba(46, 204, 113, 0.35) !important;
-    border-color: #2ecc71 !important;
-    color: #ffffff !important;
-    font-weight: 700;
-}
-
-.quiz-option-btn.wrong-opt {
-    background: rgba(231, 76, 60, 0.35) !important;
-    border-color: #e74c3c !important;
-    color: #ffffff !important;
-}
-
-.quiz-feedback {
-    margin-top: 12px;
-    padding: 10px 12px;
     border-radius: 10px;
-    font-size: 13.5px;
-    font-weight: 600;
+
+    padding: 11px 8px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.button-grid button {
+
+    background: white;
+
+    color: #222;
+}
+
+
+/* Eruption */
+
+.eruption {
+
+    width: 100%;
+
+    margin-top: 8px;
+
+    background: #d84315;
+
+    color: white;
+}
+
+
+/* Information */
+
+#info {
+
+    margin-top: 8px;
+
+    padding: 10px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    border-radius: 10px;
+
+    font-size: 13px;
+
     line-height: 1.4;
 }
 
-.quiz-feedback.correct {
-    background: rgba(46, 204, 113, 0.2);
-    border: 1px solid rgba(46, 204, 113, 0.4);
-    color: #2ecc71;
+
+/* ========================= */
+/* QUIZ                      */
+/* ========================= */
+
+.quiz {
+
+    position: absolute;
+
+    left: 10px;
+    right: 10px;
+
+    bottom: 10px;
+
+    max-width: 500px;
+
+    margin: auto;
+
+    padding: 12px;
+
+    background: rgba(0, 0, 0, 0.82);
+
+    border-radius: 15px;
+
+    pointer-events: auto;
 }
 
-.quiz-feedback.wrong {
-    background: rgba(231, 76, 60, 0.2);
-    border: 1px solid rgba(231, 76, 60, 0.4);
-    color: #ff6b6b;
+.quiz h2 {
+
+    margin: 0 0 5px;
+
+    font-size: 18px;
 }
 
-.quiz-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+.quiz p {
+
+    margin: 5px 0;
+
     font-size: 13px;
-    color: #aaa;
 }
 
-.next-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
+.quiz button {
+
+    display: block;
+
+    width: 100%;
+
+    margin: 5px 0;
+
+    background: white;
+
+    color: #222;
+
 }
 
-.next-btn:active {
-    transform: scale(0.96);
+#quiz-result {
+
+    font-weight: bold;
+
+    font-size: 14px;
 }
 
-.hidden {
-    display: none !important;
-}
 
-/* Eruption shake animation */
-body.eruption-active model-viewer {
-    animation: shake 0.15s infinite;
+/* ========================= */
+/* ERUPTION EFFECT           */
+/* ========================= */
+
+body.eruption #ar-ui {
+
+    animation: shake 0.12s infinite;
 }
 
 @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(6px) translateY(-3px); }
-    50% { transform: translateX(-6px) translateY(3px); }
-    75% { transform: translateX(4px); }
-    100% { transform: translateX(0); }
-}
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    model-viewer {
-        height: 440px;
+    0% {
+        transform: translate(0, 0);
     }
 
-    .hud-card {
-        padding: 14px;
+    25% {
+        transform: translate(3px, -2px);
     }
 
-    .nav-tab {
-        padding: 8px 10px;
-        font-size: 13px;
+    50% {
+        transform: translate(-3px, 2px);
+    }
+
+    75% {
+        transform: translate(2px, 2px);
+    }
+
+    100% {
+        transform: translate(0, 0);
     }
 }

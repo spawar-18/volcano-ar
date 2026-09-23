@@ -3,91 +3,130 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>AR Volcano Explorer</title>
 
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
-    </script>
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+    <!-- AR.js -->
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <header>
-        <h1>🌋 AR Volcano Explorer</h1>
-        <p>Explore, learn and discover how volcanoes erupt in 3D & Augmented Reality.</p>
-    </header>
+    <!-- AR CAMERA + 3D SCENE -->
+    <a-scene embedded vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;"
+        arjs="sourceType: webcam; facingMode: environment;">
 
-    <main class="main-container">
-        
-        <div class="viewer-wrapper">
-            <model-viewer id="volcano-viewer" src="volcano_model.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls shadow-intensity="1" auto-rotate
-                alt="Interactive 3D Volcano">
+        <!-- Camera -->
+        <a-camera id="ar-camera" position="0 0 0" look-controls="enabled: false">
+        </a-camera>
 
-                <button slot="ar-button" class="ar-button">
-                    📱 View Volcano in AR
-                </button>
+        <!-- Hiro marker -->
+        <a-marker id="hiro-marker" preset="hiro" emitevents="true">
 
-                <!-- Dedicated WebXR AR Overlay Slot Mount Point -->
-                <div slot="ar-overlay" id="ar-slot-mount"></div>
+            <!-- Your existing volcano model -->
+            <a-entity id="volcano-model" gltf-model="volcano_model.glb" position="0 0 0" rotation="0 0 0"
+                scale="0.5 0.5 0.5">
+            </a-entity>
 
-            </model-viewer>
+        </a-marker>
+
+    </a-scene>
+
+
+    <!-- ========================= -->
+    <!-- EDUCATIONAL UI OVERLAY    -->
+    <!-- ========================= -->
+
+    <div id="ar-ui">
+
+        <header>
+            <h1>🌋 AR Volcano Explorer</h1>
+            <p id="marker-status">🔍 Point your camera at the Hiro marker to scan</p>
+        </header>
+
+        <!-- Guide prompt shown before marker is scanned -->
+        <div id="scan-prompt" class="scan-prompt">
+            <div class="scan-card">
+                <div class="scan-icon">🎯</div>
+                <h2>Marker Required</h2>
+                <p>Scan the <strong>Hiro marker</strong> with your camera to view the 3D Volcano and unlock facts & quiz.</p>
+            </div>
         </div>
 
-        <!-- WebXR & 2D Overlay UI HUD Container -->
-        <div id="ar-overlay-container" class="ar-overlay-container mode-2d">
+        <!-- Hidden until Hiro marker is scanned -->
+        <div id="volcano-data" class="volcano-data hidden">
 
-            <!-- AR HUD Top Navigation Bar -->
-            <div class="ar-hud-nav">
-                <button id="nav-controls-btn" class="nav-tab active" onclick="switchTab('controls')">🌋 Explorer</button>
-                <button id="nav-quiz-btn" class="nav-tab" onclick="switchTab('quiz')">🧠 Quiz</button>
-                <button id="nav-toggle-btn" class="hud-toggle-btn" onclick="toggleHudVisibility()" title="Toggle UI Visibility">👁️ HUD</button>
-            </div>
+            <section class="controls">
 
-            <!-- Explorer Card -->
-            <section id="tab-controls" class="hud-card active">
-                <div class="hud-card-header">
-                    <h2>🔎 Explore Volcano Features</h2>
-                </div>
+                <h2>🔎 Explore the Volcano</h2>
 
                 <div class="button-grid">
-                    <button class="feature-btn" onclick="showInfo('crater')">🕳️ Crater</button>
-                    <button class="feature-btn" onclick="showInfo('magma')">🔥 Magma</button>
-                    <button class="feature-btn" onclick="showInfo('lava')">🌋 Lava</button>
-                    <button class="feature-btn" onclick="showInfo('ash')">💨 Ash & Gas</button>
+
+                    <button onclick="showInfo('crater')">
+                        🕳️ Crater
+                    </button>
+
+                    <button onclick="showInfo('magma')">
+                        🔥 Magma
+                    </button>
+
+                    <button onclick="showInfo('lava')">
+                        🌋 Lava
+                    </button>
+
+                    <button onclick="showInfo('ash')">
+                        💨 Ash & Gas
+                    </button>
+
                 </div>
 
-                <button class="eruption-btn" onclick="erupt()">💥 START ERUPTION</button>
+                <button class="eruption" onclick="erupt()">
+                    🌋 START ERUPTION
+                </button>
 
-                <div id="info" class="info-box">
-                    👆 Tap any volcano feature above to inspect details!
+                <div id="info">
+                    👆 Tap a volcano part above to learn about it.
                 </div>
+
             </section>
 
-            <!-- Quiz Card -->
-            <section id="tab-quiz" class="hud-card">
-                <div class="hud-card-header">
-                    <h2>🧠 Volcano Quiz</h2>
-                    <span id="quiz-progress" class="quiz-badge">Q 1/4</span>
-                </div>
 
-                <p id="question" class="quiz-question">Loading question...</p>
+            <!-- QUIZ -->
 
-                <div id="quiz-options" class="quiz-options-grid">
-                    <!-- Options generated dynamically -->
-                </div>
+            <section class="quiz">
 
-                <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+                <h2>🧠 Quick Volcano Quiz</h2>
 
-                <div class="quiz-footer">
-                    <span id="quiz-score-display">Score: 0</span>
-                    <button id="next-btn" class="next-btn hidden" onclick="nextQuestion()">Next Question ➔</button>
-                </div>
+                <p id="question">
+                    What is magma?
+                </p>
+
+                <button onclick="answer(false)">
+                    A. Volcanic ash
+                </button>
+
+                <button onclick="answer(true)">
+                    B. Molten rock beneath Earth's surface
+                </button>
+
+                <button onclick="answer(false)">
+                    C. Hardened lava
+                </button>
+
+                <p id="quiz-result"></p>
+
             </section>
 
         </div>
 
-    </main>
+    </div>
+
 
     <script src="script.js"></script>
 
