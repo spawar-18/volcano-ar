@@ -15,50 +15,79 @@
 
     <header>
         <h1>🌋 AR Volcano Explorer</h1>
-        <p>Explore, learn and discover how volcanoes erupt.</p>
+        <p>Explore, learn and discover how volcanoes erupt in 3D & Augmented Reality.</p>
     </header>
 
-    <model-viewer src="volcano_model.glb" ar ar-modes="webxr" camera-controls shadow-intensity="1" auto-rotate
-        alt="Interactive 3D Volcano">
+    <main class="main-container">
+        
+        <div class="viewer-wrapper">
+            <model-viewer id="volcano-viewer" src="volcano_model.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls shadow-intensity="1" auto-rotate
+                alt="Interactive 3D Volcano">
 
-        <button slot="ar-button" class="ar-button">
-            📱 View Volcano in AR
-        </button>
+                <button slot="ar-button" class="ar-button">
+                    📱 View Volcano in AR
+                </button>
 
-        <!-- WebXR DOM Overlay UI -->
-        <div slot="ar-overlay" id="ar-overlay-container" class="ar-overlay-container">
+                <!-- Dedicated WebXR AR Overlay Slot Mount Point -->
+                <div slot="ar-overlay" id="ar-slot-mount"></div>
 
-            <section class="controls">
-                <h2>🔎 Explore the Volcano</h2>
+            </model-viewer>
+        </div>
 
-                <div class="button-grid">
-                    <button onclick="showInfo('crater')">🕳️ Crater</button>
-                    <button onclick="showInfo('magma')">🔥 Magma</button>
-                    <button onclick="showInfo('lava')">🌋 Lava</button>
-                    <button onclick="showInfo('ash')">💨 Ash & Gas</button>
+        <!-- WebXR & 2D Overlay UI HUD Container -->
+        <div id="ar-overlay-container" class="ar-overlay-container mode-2d">
+
+            <!-- AR HUD Top Navigation Bar -->
+            <div class="ar-hud-nav">
+                <button id="nav-controls-btn" class="nav-tab active" onclick="switchTab('controls')">🌋 Explorer</button>
+                <button id="nav-quiz-btn" class="nav-tab" onclick="switchTab('quiz')">🧠 Quiz</button>
+                <button id="nav-toggle-btn" class="hud-toggle-btn" onclick="toggleHudVisibility()" title="Toggle UI Visibility">👁️ HUD</button>
+            </div>
+
+            <!-- Explorer Card -->
+            <section id="tab-controls" class="hud-card active">
+                <div class="hud-card-header">
+                    <h2>🔎 Explore Volcano Features</h2>
                 </div>
 
-                <button class="eruption" onclick="erupt()">🌋 START ERUPTION</button>
+                <div class="button-grid">
+                    <button class="feature-btn" onclick="showInfo('crater')">🕳️ Crater</button>
+                    <button class="feature-btn" onclick="showInfo('magma')">🔥 Magma</button>
+                    <button class="feature-btn" onclick="showInfo('lava')">🌋 Lava</button>
+                    <button class="feature-btn" onclick="showInfo('ash')">💨 Ash & Gas</button>
+                </div>
 
-                <div id="info">
-                    👆 Tap a volcano part above to learn about it.
+                <button class="eruption-btn" onclick="erupt()">💥 START ERUPTION</button>
+
+                <div id="info" class="info-box">
+                    👆 Tap any volcano feature above to inspect details!
                 </div>
             </section>
 
-            <section class="quiz">
-                <h2>🧠 Quick Volcano Quiz</h2>
-                <p id="question">What is magma?</p>
+            <!-- Quiz Card -->
+            <section id="tab-quiz" class="hud-card">
+                <div class="hud-card-header">
+                    <h2>🧠 Volcano Quiz</h2>
+                    <span id="quiz-progress" class="quiz-badge">Q 1/4</span>
+                </div>
 
-                <button onclick="answer(false)">A. Volcanic ash</button>
-                <button onclick="answer(true)">B. Molten rock beneath Earth's surface</button>
-                <button onclick="answer(false)">C. Hardened lava</button>
+                <p id="question" class="quiz-question">Loading question...</p>
 
-                <p id="quiz-result"></p>
+                <div id="quiz-options" class="quiz-options-grid">
+                    <!-- Options generated dynamically -->
+                </div>
+
+                <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+
+                <div class="quiz-footer">
+                    <span id="quiz-score-display">Score: 0</span>
+                    <button id="next-btn" class="next-btn hidden" onclick="nextQuestion()">Next Question ➔</button>
+                </div>
             </section>
 
         </div>
 
-    </model-viewer>
+    </main>
 
     <script src="script.js"></script>
 
