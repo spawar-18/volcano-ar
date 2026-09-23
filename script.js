@@ -242,34 +242,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const arMount = document.getElementById('ar-slot-mount');
     const mainContainer = document.querySelector('.main-container');
 
+    // AR touch suppression handler — stops WebXR gesture from swallowing button taps
+    // Only active during an AR session
+    function arTouchSuppressor(e) {
+        if (e.target.closest('button, .hud-card, .ar-hud-nav')) {
+            e.stopPropagation();
+        }
+    }
+
     // Handle AR status changes (WebXR session start / end)
     if (viewer && overlay) {
         viewer.addEventListener('ar-status', (event) => {
             const status = event.detail.status;
+
             if (status === 'session-started' || status === 'object-placed') {
+                // Move overlay into the AR slot
                 if (arMount && !arMount.contains(overlay)) {
                     arMount.appendChild(overlay);
                 }
                 overlay.classList.remove('mode-2d');
                 overlay.classList.add('mode-ar');
+
+                // Attach touch suppression only during AR session
+                ['beforexrselect', 'touchstart', 'touchend', 'click'].forEach(evt => {
+                    overlay.addEventListener(evt, arTouchSuppressor, true);
+                });
+
             } else if (status === 'not-presenting') {
+                // Move overlay back to 2D page
                 if (mainContainer && !mainContainer.contains(overlay)) {
                     mainContainer.appendChild(overlay);
                 }
                 overlay.classList.remove('mode-ar');
                 overlay.classList.add('mode-2d');
-            }
-        });
-    }
 
-    // Prevent WebXR model placement gestures from swallowing button taps
-    if (overlay) {
-        ['beforexrselect', 'touchstart', 'touchend', 'click'].forEach(eventType => {
-            overlay.addEventListener(eventType, (e) => {
-                if (e.target.closest('button, .hud-card, .ar-hud-nav')) {
-                    e.stopPropagation();
-                }
-            }, true);
+                // Remove touch suppression when back in 2D
+                ['beforexrselect', 'touchstart', 'touchend', 'click'].forEach(evt => {
+                    overlay.removeEventListener(evt, arTouchSuppressor, true);
+                });
+            }
         });
     }
 });

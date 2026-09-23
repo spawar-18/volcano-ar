@@ -92,7 +92,6 @@ model-viewer {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    z-index: 9999;
 }
 
 /* Standard 2D Page View mode */
@@ -115,6 +114,7 @@ model-viewer {
     pointer-events: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    z-index: 9999;
 }
 
 /* Restore pointer-events for interactive children in AR mode */
