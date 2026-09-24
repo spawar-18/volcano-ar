@@ -56,19 +56,44 @@ function answer(correct) {
 }
 
 
+let isExploring = false;
+let hasDetected = false;
+let markerLostTimeout = null;
+
+// Keep model visible in AR scene even if camera tilts or moves during interaction
+AFRAME.registerComponent('persistent-volcano', {
+    init: function () {
+        this.marker = this.el;
+    },
+    tick: function () {
+        // If user is currently exploring or model was detected and active, enforce visibility
+        if (isExploring && this.marker && this.marker.object3D) {
+            this.marker.object3D.visible = true;
+        }
+    }
+});
+
+
 // Toggle facts and quiz panel
 function toggleExplore(show) {
+    isExploring = show;
     const volcanoData = document.getElementById('volcano-data');
     const exploreBar = document.getElementById('explore-bar');
+    const scanPrompt = document.getElementById('scan-prompt');
+    const marker = document.getElementById('hiro-marker');
 
-    if (volcanoData) {
-        if (show) {
-            volcanoData.classList.remove('hidden');
-            if (exploreBar) exploreBar.classList.add('hidden');
-        } else {
-            volcanoData.classList.add('hidden');
-            if (exploreBar) exploreBar.classList.remove('hidden');
+    if (show) {
+        if (volcanoData) volcanoData.classList.remove('hidden');
+        if (exploreBar) exploreBar.classList.add('hidden');
+        if (scanPrompt) scanPrompt.classList.add('hidden');
+        
+        // Ensure 3D model stays active while exploring
+        if (marker && marker.object3D) {
+            marker.object3D.visible = true;
         }
+    } else {
+        if (volcanoData) volcanoData.classList.add('hidden');
+        if (exploreBar) exploreBar.classList.remove('hidden');
     }
 }
 
@@ -76,6 +101,10 @@ function toggleExplore(show) {
 // Marker Detection Logic: Show 3D Model & Explore Button when Hiro marker is scanned
 window.addEventListener('load', () => {
     const marker = document.querySelector('a-marker');
+    if (marker) {
+        marker.setAttribute('persistent-volcano', '');
+    }
+
     const markerContainer = document.getElementById('marker-detected-container');
     const volcanoData = document.getElementById('volcano-data');
     const exploreBar = document.getElementById('explore-bar');
@@ -84,33 +113,53 @@ window.addEventListener('load', () => {
 
     if (marker) {
         marker.addEventListener('markerFound', () => {
+            hasDetected = true;
+            if (markerLostTimeout) {
+                clearTimeout(markerLostTimeout);
+                markerLostTimeout = null;
+            }
+
             if (markerContainer) {
                 markerContainer.classList.remove('hidden');
             }
-            if (exploreBar) {
+            if (exploreBar && !isExploring) {
                 exploreBar.classList.remove('hidden');
             }
             if (scanPrompt) {
                 scanPrompt.classList.add('hidden');
             }
             if (markerStatus) {
-                markerStatus.innerText = '✅ Volcano Model Active! Tap "Explore More" below.';
+                markerStatus.innerText = '✅ Volcano Model Active! Explore below.';
             }
         });
 
         marker.addEventListener('markerLost', () => {
-            if (markerContainer) {
-                markerContainer.classList.add('hidden');
+            // DO NOT remove the model or hide the UI if the user is currently exploring!
+            if (isExploring) {
+                if (marker.object3D) {
+                    marker.object3D.visible = true;
+                }
+                return;
             }
-            if (volcanoData) {
-                volcanoData.classList.add('hidden');
-            }
-            if (scanPrompt) {
-                scanPrompt.classList.remove('hidden');
-            }
-            if (markerStatus) {
-                markerStatus.innerText = '🔍 Point your camera at the Hiro marker to scan';
-            }
+
+            // If not exploring, use a grace period (2.5s) to avoid losing model on brief hand/camera jitters
+            if (markerLostTimeout) clearTimeout(markerLostTimeout);
+            markerLostTimeout = setTimeout(() => {
+                if (!isExploring) {
+                    if (markerContainer) {
+                        markerContainer.classList.add('hidden');
+                    }
+                    if (volcanoData) {
+                        volcanoData.classList.add('hidden');
+                    }
+                    if (scanPrompt) {
+                        scanPrompt.classList.remove('hidden');
+                    }
+                    if (markerStatus) {
+                        markerStatus.innerText = '🔍 Point your camera at the Hiro marker to scan';
+                    }
+                }
+            }, 2500);
         });
     }
 });

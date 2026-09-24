@@ -24,10 +24,10 @@
         <a-camera id="ar-camera" position="0 0 0" look-controls="enabled: false">
         </a-camera>
 
-        <!-- Hiro marker -->
-        <a-marker id="hiro-marker" preset="hiro" emitevents="true">
+        <!-- Hiro marker with smoothing -->
+        <a-marker id="hiro-marker" preset="hiro" emitevents="true" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
 
-            <!--   existing volcano model -->
+            <!-- existing volcano model -->
             <a-entity id="volcano-model" gltf-model="volcano_model.glb" position="0 0 0" rotation="0 0 0"
                 scale="0.5 0.5 0.5">
             </a-entity>
