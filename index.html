@@ -15,9 +15,7 @@
 
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <!-- AR CAMERA + 3D SCENE -->
     <a-scene embedded vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;"
         arjs="sourceType: webcam; facingMode: environment;">
@@ -29,13 +27,11 @@
         <!-- Hiro marker -->
         <a-marker id="hiro-marker" preset="hiro" emitevents="true">
 
-            <!-- Your existing volcano model -->
+            <!--   existing volcano model -->
             <a-entity id="volcano-model" gltf-model="volcano_model.glb" position="0 0 0" rotation="0 0 0"
                 scale="0.5 0.5 0.5">
             </a-entity>
-
         </a-marker>
-
     </a-scene>
 
 
@@ -55,73 +51,91 @@
             <div class="scan-card">
                 <div class="scan-icon">🎯</div>
                 <h2>Marker Required</h2>
-                <p>Scan the <strong>Hiro marker</strong> with your camera to view the 3D Volcano and unlock facts & quiz.</p>
+                <p>Scan the <strong>Hiro marker</strong> with your camera to view the 3D Volcano.</p>
             </div>
         </div>
 
-        <!-- Hidden until Hiro marker is scanned -->
-        <div id="volcano-data" class="volcano-data hidden">
+        <!-- Container shown ONLY when Hiro marker is detected -->
+        <div id="marker-detected-container" class="marker-detected-container hidden">
 
-            <section class="controls">
+            <!-- "Explore More" floating button shown first -->
+            <div id="explore-bar" class="explore-bar">
+                <button id="explore-btn" class="btn-explore" onclick="toggleExplore(true)">
+                    <span>✨ Explore More (Facts & Quiz)</span>
+                    <span class="btn-icon">⬇</span>
+                </button>
+            </div>
 
-                <h2>🔎 Explore the Volcano</h2>
+            <!-- Detailed info panel: hidden until 'Explore More' is clicked -->
+            <div id="volcano-data" class="volcano-data hidden">
 
-                <div class="button-grid">
-
-                    <button onclick="showInfo('crater')">
-                        🕳️ Crater
-                    </button>
-
-                    <button onclick="showInfo('magma')">
-                        🔥 Magma
-                    </button>
-
-                    <button onclick="showInfo('lava')">
-                        🌋 Lava
-                    </button>
-
-                    <button onclick="showInfo('ash')">
-                        💨 Ash & Gas
-                    </button>
-
+                <div class="sheet-top-bar">
+                    <span class="sheet-title">🌋 Facts & Quiz</span>
+                    <button class="btn-sheet-close" onclick="toggleExplore(false)" aria-label="Close details">✕ Close</button>
                 </div>
 
-                <button class="eruption" onclick="erupt()">
-                    🌋 START ERUPTION
-                </button>
+                <section class="controls">
 
-                <div id="info">
-                    👆 Tap a volcano part above to learn about it.
-                </div>
+                    <h2>🔎 Explore Volcano Parts</h2>
 
-            </section>
+                    <div class="button-grid">
+
+                        <button onclick="showInfo('crater')">
+                            🕳️ Crater
+                        </button>
+
+                        <button onclick="showInfo('magma')">
+                            🔥 Magma
+                        </button>
+
+                        <button onclick="showInfo('lava')">
+                            🌋 Lava
+                        </button>
+
+                        <button onclick="showInfo('ash')">
+                            💨 Ash & Gas
+                        </button>
+
+                    </div>
+
+                    <button class="eruption" onclick="erupt()">
+                        🌋 START ERUPTION
+                    </button>
+
+                    <div id="info">
+                        👆 Tap a volcano part above to learn about it.
+                    </div>
+
+                </section>
 
 
-            <!-- QUIZ -->
+                <!-- QUIZ -->
 
-            <section class="quiz">
+                <section class="quiz">
 
-                <h2>🧠 Quick Volcano Quiz</h2>
+                    <h2>🧠 Quick Volcano Quiz</h2>
 
-                <p id="question">
-                    What is magma?
-                </p>
+                    <p id="question">
+                        What is magma?
+                    </p>
 
-                <button onclick="answer(false)">
-                    A. Volcanic ash
-                </button>
+                    <button onclick="answer(false)">
+                        A. Volcanic ash
+                    </button>
 
-                <button onclick="answer(true)">
-                    B. Molten rock beneath Earth's surface
-                </button>
+                    <button onclick="answer(true)">
+                        B. Molten rock beneath Earth's surface
+                    </button>
 
-                <button onclick="answer(false)">
-                    C. Hardened lava
-                </button>
+                    <button onclick="answer(false)">
+                        C. Hardened lava
+                    </button>
 
-                <p id="quiz-result"></p>
+                    <p id="quiz-result"></p>
 
-            </section>
+                </section>
+
+            </div>
 
         </div>
 

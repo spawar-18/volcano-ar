@@ -141,31 +141,143 @@ header p {
 
 
 /* ========================= */
-/* VOLCANO DATA VISIBILITY   */
+/* MARKER DETECTED CONTAINER */
 /* ========================= */
 
-.volcano-data {
+.marker-detected-container {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 30;
+}
+
+.marker-detected-container.hidden {
+    display: none !important;
+}
+
+/* Explore More Floating Bar */
+.explore-bar {
+    padding: 16px 20px 28px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    pointer-events: auto;
+    animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.explore-bar.hidden {
+    display: none !important;
+}
+
+.btn-explore {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #ff5722 0%, #d84315 100%);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    box-shadow: 0 8px 25px rgba(216, 67, 21, 0.6), 0 0 15px rgba(255, 112, 67, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    letter-spacing: 0.3px;
+}
+
+.btn-explore:hover, .btn-explore:active {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 30px rgba(216, 67, 21, 0.8), 0 0 20px rgba(255, 112, 67, 0.6);
+}
+
+.btn-icon {
+    font-size: 16px;
+    display: inline-block;
+    animation: float-down 1.2s infinite ease-in-out;
+}
+
+@keyframes float-down {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+}
+
+@keyframes bounce-in {
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+
+/* ========================= */
+/* VOLCANO DATA DRAWER       */
+/* ========================= */
+
+.volcano-data {
+    position: relative;
+    width: 100%;
+    max-height: calc(100vh - 100px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding: 10px 12px 24px;
-    pointer-events: none;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    opacity: 1;
+    gap: 12px;
+    padding: 10px 14px 28px;
+    pointer-events: auto;
+    background: rgba(10, 15, 28, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 112, 67, 0.3);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.6);
+    animation: slide-up 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .volcano-data.hidden {
     display: none !important;
-    opacity: 0;
-    pointer-events: none !important;
+}
+
+@keyframes slide-up {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.sheet-top-bar {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 2px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sheet-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffb74d;
+}
+
+.btn-sheet-close {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-sheet-close:hover, .btn-sheet-close:active {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .volcano-data::-webkit-scrollbar {

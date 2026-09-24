@@ -56,27 +56,52 @@ function answer(correct) {
 }
 
 
-// Marker Detection Logic: Show volcano data ONLY when Hiro marker is scanned
+// Toggle facts and quiz panel
+function toggleExplore(show) {
+    const volcanoData = document.getElementById('volcano-data');
+    const exploreBar = document.getElementById('explore-bar');
+
+    if (volcanoData) {
+        if (show) {
+            volcanoData.classList.remove('hidden');
+            if (exploreBar) exploreBar.classList.add('hidden');
+        } else {
+            volcanoData.classList.add('hidden');
+            if (exploreBar) exploreBar.classList.remove('hidden');
+        }
+    }
+}
+
+
+// Marker Detection Logic: Show 3D Model & Explore Button when Hiro marker is scanned
 window.addEventListener('load', () => {
     const marker = document.querySelector('a-marker');
+    const markerContainer = document.getElementById('marker-detected-container');
     const volcanoData = document.getElementById('volcano-data');
+    const exploreBar = document.getElementById('explore-bar');
     const scanPrompt = document.getElementById('scan-prompt');
     const markerStatus = document.getElementById('marker-status');
 
     if (marker) {
         marker.addEventListener('markerFound', () => {
-            if (volcanoData) {
-                volcanoData.classList.remove('hidden');
+            if (markerContainer) {
+                markerContainer.classList.remove('hidden');
+            }
+            if (exploreBar) {
+                exploreBar.classList.remove('hidden');
             }
             if (scanPrompt) {
                 scanPrompt.classList.add('hidden');
             }
             if (markerStatus) {
-                markerStatus.innerText = '✅ Marker Detected! Explore volcano parts & quiz below.';
+                markerStatus.innerText = '✅ Volcano Model Active! Tap "Explore More" below.';
             }
         });
 
         marker.addEventListener('markerLost', () => {
+            if (markerContainer) {
+                markerContainer.classList.add('hidden');
+            }
             if (volcanoData) {
                 volcanoData.classList.add('hidden');
             }
