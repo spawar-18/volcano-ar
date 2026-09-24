@@ -180,55 +180,158 @@ AFRAME.registerComponent('persistent-volcano', {
 });
 
 
-// Touch & Mouse Drag to Rotate 360° anywhere on the screen
-(function setupDragRotation() {
-    let isDragging = false;
+// Multi-Touch (Pinch-to-Zoom & 360 Drag Rotate) + Mouse Gestures
+(function setupTouchAndMouseGestures() {
+    let isSingleDragging = false;
+    let isPinching = false;
+
+    // Single touch / Mouse tracking
     let startX = 0;
     let startY = 0;
     let initialRotY = 0;
     let initialRotX = 0;
 
-    function onPointerDown(e) {
-        // Don't drag if touching buttons or cards
-        if (e.target.closest('button, .controls, .quiz, .scan-card, .sheet-top-bar')) return;
+    // Two finger pinch tracking
+    let initialPinchDist = 0;
+    let initialScaleOnPinch = 0.5;
+    let initialPinchAngle = 0;
 
-        isDragging = true;
-        const point = e.touches ? e.touches[0] : e;
-        startX = point.clientX;
-        startY = point.clientY;
-        initialRotY = currentRotationY;
-        initialRotX = currentRotationX;
+    function getTouchDistance(t1, t2) {
+        const dx = t1.clientX - t2.clientX;
+        const dy = t1.clientY - t2.clientY;
+        return Math.hypot(dx, dy);
+    }
 
-        if (isAutoRotating) {
-            toggleAutoRotate();
+    function getTouchAngle(t1, t2) {
+        return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * (180 / Math.PI);
+    }
+
+    function isInteractiveTarget(target) {
+        return target && target.closest('button, .controls, .quiz, .scan-card, .sheet-top-bar, .sheet-header');
+    }
+
+    // --- TOUCH EVENTS (Phone Screen) ---
+    function onTouchStart(e) {
+        if (isInteractiveTarget(e.target)) return;
+
+        if (e.touches.length === 1) {
+            // Single finger drag to rotate 360°
+            isSingleDragging = true;
+            isPinching = false;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            initialRotY = currentRotationY;
+            initialRotX = currentRotationX;
+
+            if (isAutoRotating) toggleAutoRotate();
+        } else if (e.touches.length === 2) {
+            // Two fingers: Pinch-to-zoom & twist
+            isSingleDragging = false;
+            isPinching = true;
+            initialPinchDist = getTouchDistance(e.touches[0], e.touches[1]);
+            initialScaleOnPinch = currentScale;
+            initialPinchAngle = getTouchAngle(e.touches[0], e.touches[1]);
+            initialRotY = currentRotationY;
+
+            if (isAutoRotating) toggleAutoRotate();
         }
     }
 
-    function onPointerMove(e) {
-        if (!isDragging) return;
-        const point = e.touches ? e.touches[0] : e;
-        const deltaX = point.clientX - startX;
-        const deltaY = point.clientY - startY;
+    function onTouchMove(e) {
+        if (isInteractiveTarget(e.target)) return;
 
-        // 360 degree horizontal yaw + subtle vertical pitch tilt
+        if (isSingleDragging && e.touches.length === 1) {
+            e.preventDefault(); // Prevent page pull/scroll during 3D rotation
+            const deltaX = e.touches[0].clientX - startX;
+            const deltaY = e.touches[0].clientY - startY;
+
+            // Full 360° horizontal rotation + vertical pitch tilt
+            currentRotationY = (initialRotY + deltaX * 0.7) % 360;
+            if (currentRotationY < 0) currentRotationY += 360;
+
+            currentRotationX = Math.max(-60, Math.min(60, initialRotX + deltaY * 0.4));
+            applyModelTransform();
+        } else if (isPinching && e.touches.length === 2) {
+            e.preventDefault(); // Prevent default mobile browser pinch-zoom
+            const currentDist = getTouchDistance(e.touches[0], e.touches[1]);
+            if (initialPinchDist > 0) {
+                const scaleFactor = currentDist / initialPinchDist;
+                currentScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, +(initialScaleOnPinch * scaleFactor).toFixed(3)));
+            }
+
+            // Two-finger twist rotation
+            const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
+            const angleDelta = currentAngle - initialPinchAngle;
+            currentRotationY = (initialRotY + angleDelta) % 360;
+            if (currentRotationY < 0) currentRotationY += 360;
+
+            applyModelTransform();
+        }
+    }
+
+    function onTouchEnd(e) {
+        if (e.touches.length === 0) {
+            isSingleDragging = false;
+            isPinching = false;
+        } else if (e.touches.length === 1) {
+            // Transition from pinch to single drag
+            isPinching = false;
+            isSingleDragging = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            initialRotY = currentRotationY;
+            initialRotX = currentRotationX;
+        }
+    }
+
+    // --- MOUSE EVENTS (Desktop Testing) ---
+    let isMouseDown = false;
+    function onMouseDown(e) {
+        if (isInteractiveTarget(e.target) || e.button !== 0) return;
+        isMouseDown = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialRotY = currentRotationY;
+        initialRotX = currentRotationX;
+        if (isAutoRotating) toggleAutoRotate();
+    }
+
+    function onMouseMove(e) {
+        if (!isMouseDown) return;
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
         currentRotationY = (initialRotY + deltaX * 0.6) % 360;
         if (currentRotationY < 0) currentRotationY += 360;
 
-        currentRotationX = Math.max(-40, Math.min(40, initialRotX + deltaY * 0.3));
+        currentRotationX = Math.max(-60, Math.min(60, initialRotX + deltaY * 0.35));
         applyModelTransform();
     }
 
-    function onPointerUp() {
-        isDragging = false;
+    function onMouseUp() {
+        isMouseDown = false;
     }
 
-    window.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
+    function onWheel(e) {
+        if (isInteractiveTarget(e.target)) return;
+        e.preventDefault();
+        if (e.deltaY < 0) {
+            currentScale = Math.min(MAX_SCALE, +(currentScale * 1.1).toFixed(3));
+        } else {
+            currentScale = Math.max(MIN_SCALE, +(currentScale * 0.9).toFixed(3));
+        }
+        applyModelTransform();
+    }
 
-    window.addEventListener('touchstart', onPointerDown, { passive: true });
-    window.addEventListener('touchmove', onPointerMove, { passive: true });
-    window.addEventListener('touchend', onPointerUp);
+    window.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchcancel', onTouchEnd);
+
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('wheel', onWheel, { passive: false });
 })();
 
 
