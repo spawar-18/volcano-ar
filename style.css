@@ -141,6 +141,86 @@ header p {
 
 
 /* ========================= */
+/* 3D MODEL CONTROLS TOOLBAR */
+/* ========================= */
+
+.model-controls {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+    z-index: 25;
+    animation: fade-in-right 0.4s ease-out;
+}
+
+.model-controls.hidden {
+    display: none !important;
+}
+
+@keyframes fade-in-right {
+    0% { transform: translateY(-50%) translateX(30px); opacity: 0; }
+    100% { transform: translateY(-50%) translateX(0); opacity: 1; }
+}
+
+.model-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 2px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.model-btn:hover, .model-btn:active {
+    background: rgba(255, 112, 67, 0.85);
+    border-color: #ff7043;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(255, 112, 67, 0.4);
+}
+
+.model-btn .btn-symbol {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.model-btn .btn-label {
+    font-size: 9px;
+    font-weight: 700;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #ffd8a8;
+}
+
+.model-btn.btn-reset {
+    background: rgba(255, 87, 34, 0.25);
+    border-color: rgba(255, 87, 34, 0.4);
+}
+
+.model-btn.btn-reset:hover {
+    background: rgba(255, 87, 34, 0.9);
+}
+
+
+/* ========================= */
 /* MARKER DETECTED CONTAINER */
 /* ========================= */
 

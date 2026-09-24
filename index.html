@@ -55,6 +55,30 @@
             </div>
         </div>
 
+        <!-- 3D Model Control Toolbar (Zoom & Rotate) -->
+        <div id="model-controls" class="model-controls hidden">
+            <button class="model-btn" onclick="zoomModel(1)" aria-label="Zoom In" title="Zoom In">
+                <span class="btn-symbol">➕</span>
+                <span class="btn-label">Zoom In</span>
+            </button>
+            <button class="model-btn" onclick="zoomModel(-1)" aria-label="Zoom Out" title="Zoom Out">
+                <span class="btn-symbol">➖</span>
+                <span class="btn-label">Zoom Out</span>
+            </button>
+            <button class="model-btn" onclick="rotateModel(-25)" aria-label="Rotate Left" title="Rotate Left">
+                <span class="btn-symbol">↺</span>
+                <span class="btn-label">Rotate L</span>
+            </button>
+            <button class="model-btn" onclick="rotateModel(25)" aria-label="Rotate Right" title="Rotate Right">
+                <span class="btn-symbol">↻</span>
+                <span class="btn-label">Rotate R</span>
+            </button>
+            <button class="model-btn btn-reset" onclick="resetModelTransform()" aria-label="Reset View" title="Reset View">
+                <span class="btn-symbol">🎯</span>
+                <span class="btn-label">Reset</span>
+            </button>
+        </div>
+
         <!-- Container shown ONLY when Hiro marker is detected -->
         <div id="marker-detected-container" class="marker-detected-container hidden">
 

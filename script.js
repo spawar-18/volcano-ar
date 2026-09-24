@@ -60,6 +60,48 @@ let isExploring = false;
 let hasDetected = false;
 let markerLostTimeout = null;
 
+// 3D Model transformation state
+let currentScale = 0.5;
+let currentRotationY = 0;
+const MIN_SCALE = 0.15;
+const MAX_SCALE = 2.2;
+
+// Zoom In / Zoom Out
+function zoomModel(direction) {
+    const model = document.getElementById('volcano-model');
+    if (!model) return;
+
+    if (direction > 0) {
+        currentScale = Math.min(MAX_SCALE, +(currentScale * 1.25).toFixed(3));
+    } else {
+        currentScale = Math.max(MIN_SCALE, +(currentScale * 0.8).toFixed(3));
+    }
+
+    model.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+}
+
+// Rotate Volcano Left / Right
+function rotateModel(degrees) {
+    const model = document.getElementById('volcano-model');
+    if (!model) return;
+
+    currentRotationY = (currentRotationY + degrees) % 360;
+    const currentRotation = model.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+    model.setAttribute('rotation', `${currentRotation.x || 0} ${currentRotationY} ${currentRotation.z || 0}`);
+}
+
+// Reset Model Transformation
+function resetModelTransform() {
+    const model = document.getElementById('volcano-model');
+    if (!model) return;
+
+    currentScale = 0.5;
+    currentRotationY = 0;
+    model.setAttribute('scale', '0.5 0.5 0.5');
+    model.setAttribute('rotation', '0 0 0');
+}
+
+
 // Keep model visible in AR scene even if camera tilts or moves during interaction
 AFRAME.registerComponent('persistent-volcano', {
     init: function () {
@@ -80,12 +122,14 @@ function toggleExplore(show) {
     const volcanoData = document.getElementById('volcano-data');
     const exploreBar = document.getElementById('explore-bar');
     const scanPrompt = document.getElementById('scan-prompt');
+    const modelControls = document.getElementById('model-controls');
     const marker = document.getElementById('hiro-marker');
 
     if (show) {
         if (volcanoData) volcanoData.classList.remove('hidden');
         if (exploreBar) exploreBar.classList.add('hidden');
         if (scanPrompt) scanPrompt.classList.add('hidden');
+        if (modelControls) modelControls.classList.remove('hidden');
         
         // Ensure 3D model stays active while exploring
         if (marker && marker.object3D) {
@@ -106,6 +150,7 @@ window.addEventListener('load', () => {
     }
 
     const markerContainer = document.getElementById('marker-detected-container');
+    const modelControls = document.getElementById('model-controls');
     const volcanoData = document.getElementById('volcano-data');
     const exploreBar = document.getElementById('explore-bar');
     const scanPrompt = document.getElementById('scan-prompt');
@@ -121,6 +166,9 @@ window.addEventListener('load', () => {
 
             if (markerContainer) {
                 markerContainer.classList.remove('hidden');
+            }
+            if (modelControls) {
+                modelControls.classList.remove('hidden');
             }
             if (exploreBar && !isExploring) {
                 exploreBar.classList.remove('hidden');
@@ -148,6 +196,9 @@ window.addEventListener('load', () => {
                 if (!isExploring) {
                     if (markerContainer) {
                         markerContainer.classList.add('hidden');
+                    }
+                    if (modelControls) {
+                        modelControls.classList.add('hidden');
                     }
                     if (volcanoData) {
                         volcanoData.classList.add('hidden');
