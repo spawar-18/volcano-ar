@@ -217,6 +217,32 @@ header p {
     pointer-events: none;
 }
 
+.model-btn.btn-spin {
+    background: rgba(33, 150, 243, 0.25);
+    border-color: rgba(33, 150, 243, 0.45);
+}
+
+.model-btn.btn-spin:hover, .model-btn.btn-spin:active {
+    background: rgba(33, 150, 243, 0.85);
+    border-color: #2196f3;
+}
+
+.model-btn.btn-spin.active {
+    background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+    border-color: #ffeb3b;
+    box-shadow: 0 0 16px rgba(255, 152, 0, 0.8);
+}
+
+.model-btn.btn-spin.active .btn-symbol {
+    display: inline-block;
+    animation: rotate-continuous 2s infinite linear;
+}
+
+@keyframes rotate-continuous {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .model-btn.btn-reset {
     background: rgba(255, 87, 34, 0.3);
     border-color: rgba(255, 87, 34, 0.5);

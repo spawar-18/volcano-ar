@@ -58,11 +58,13 @@ function answer(correct) {
 
 let isExploring = false;
 let hasDetected = false;
+let isAutoRotating = false;
 let markerLostTimeout = null;
 
-// 3D Model transformation state
+// 3D Model transformation state (Full 360 Yaw + Pitch tilt)
 let currentScale = 0.5;
 let currentRotationY = 0;
+let currentRotationX = 0;
 const MIN_SCALE = 0.1;
 const MAX_SCALE = 3.0;
 
@@ -72,12 +74,31 @@ function applyModelTransform() {
 
     // 1. Update A-Frame attributes
     model.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
-    model.setAttribute('rotation', `0 ${currentRotationY} 0`);
+    model.setAttribute('rotation', `${currentRotationX} ${currentRotationY} 0`);
 
     // 2. Direct Three.js Object3D manipulation for immediate GLTF rendering
     if (model.object3D) {
         model.object3D.scale.set(currentScale, currentScale, currentScale);
         model.object3D.rotation.y = (currentRotationY * Math.PI) / 180;
+        model.object3D.rotation.x = (currentRotationX * Math.PI) / 180;
+    }
+}
+
+// Toggle 360° Continuous Auto Rotation
+function toggleAutoRotate(event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    isAutoRotating = !isAutoRotating;
+    const spinBtn = document.getElementById('btn-spin-360');
+    if (spinBtn) {
+        if (isAutoRotating) {
+            spinBtn.classList.add('active');
+        } else {
+            spinBtn.classList.remove('active');
+        }
     }
 }
 
@@ -97,14 +118,20 @@ function zoomModel(direction, event) {
     applyModelTransform();
 }
 
-// Rotate Volcano Left / Right
+// Rotate Volcano Left / Right (360° continuous)
 function rotateModel(degrees, event) {
     if (event) {
         event.stopPropagation();
         event.preventDefault();
     }
 
+    // Stop auto-rotation when user manually steps
+    if (isAutoRotating) {
+        toggleAutoRotate();
+    }
+
     currentRotationY = (currentRotationY + degrees) % 360;
+    if (currentRotationY < 0) currentRotationY += 360;
     applyModelTransform();
 }
 
@@ -115,13 +142,18 @@ function resetModelTransform(event) {
         event.preventDefault();
     }
 
+    if (isAutoRotating) {
+        toggleAutoRotate();
+    }
+
     currentScale = 0.5;
     currentRotationY = 0;
+    currentRotationX = 0;
     applyModelTransform();
 }
 
 
-// Keep model visible and ensure transforms stay active on every frame
+// Keep model visible and enforce transforms on every frame
 AFRAME.registerComponent('persistent-volcano', {
     init: function () {
         this.marker = this.el;
@@ -132,14 +164,72 @@ AFRAME.registerComponent('persistent-volcano', {
             this.marker.object3D.visible = true;
         }
 
+        // Auto 360° spin loop
+        if (isAutoRotating) {
+            currentRotationY = (currentRotationY + 0.6) % 360;
+        }
+
         // Apply scale & rotation on every render tick so AR matrix updates don't override them
         const model = document.getElementById('volcano-model');
         if (model && model.object3D) {
             model.object3D.scale.set(currentScale, currentScale, currentScale);
             model.object3D.rotation.y = (currentRotationY * Math.PI) / 180;
+            model.object3D.rotation.x = (currentRotationX * Math.PI) / 180;
         }
     }
 });
+
+
+// Touch & Mouse Drag to Rotate 360° anywhere on the screen
+(function setupDragRotation() {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let initialRotY = 0;
+    let initialRotX = 0;
+
+    function onPointerDown(e) {
+        // Don't drag if touching buttons or cards
+        if (e.target.closest('button, .controls, .quiz, .scan-card, .sheet-top-bar')) return;
+
+        isDragging = true;
+        const point = e.touches ? e.touches[0] : e;
+        startX = point.clientX;
+        startY = point.clientY;
+        initialRotY = currentRotationY;
+        initialRotX = currentRotationX;
+
+        if (isAutoRotating) {
+            toggleAutoRotate();
+        }
+    }
+
+    function onPointerMove(e) {
+        if (!isDragging) return;
+        const point = e.touches ? e.touches[0] : e;
+        const deltaX = point.clientX - startX;
+        const deltaY = point.clientY - startY;
+
+        // 360 degree horizontal yaw + subtle vertical pitch tilt
+        currentRotationY = (initialRotY + deltaX * 0.6) % 360;
+        if (currentRotationY < 0) currentRotationY += 360;
+
+        currentRotationX = Math.max(-40, Math.min(40, initialRotX + deltaY * 0.3));
+        applyModelTransform();
+    }
+
+    function onPointerUp() {
+        isDragging = false;
+    }
+
+    window.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    window.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+})();
 
 
 // Toggle facts and quiz panel

@@ -55,8 +55,12 @@
             </div>
         </div>
 
-        <!-- 3D Model Control Toolbar (Zoom & Rotate) -->
+        <!-- 3D Model Control Toolbar (Zoom & 360 Rotate) -->
         <div id="model-controls" class="model-controls hidden">
+            <button id="btn-spin-360" class="model-btn btn-spin" onclick="toggleAutoRotate(event)" aria-label="360 Auto Spin" title="Toggle 360° Continuous Spin">
+                <span class="btn-symbol">🌀</span>
+                <span class="btn-label">360° Spin</span>
+            </button>
             <button id="btn-zoom-in" class="model-btn" onclick="zoomModel(1, event)" aria-label="Zoom In" title="Zoom In">
                 <span class="btn-symbol">➕</span>
                 <span class="btn-label">Zoom In</span>
