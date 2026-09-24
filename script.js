@@ -63,54 +63,80 @@ let markerLostTimeout = null;
 // 3D Model transformation state
 let currentScale = 0.5;
 let currentRotationY = 0;
-const MIN_SCALE = 0.15;
-const MAX_SCALE = 2.2;
+const MIN_SCALE = 0.1;
+const MAX_SCALE = 3.0;
 
-// Zoom In / Zoom Out
-function zoomModel(direction) {
+function applyModelTransform() {
     const model = document.getElementById('volcano-model');
     if (!model) return;
 
-    if (direction > 0) {
-        currentScale = Math.min(MAX_SCALE, +(currentScale * 1.25).toFixed(3));
-    } else {
-        currentScale = Math.max(MIN_SCALE, +(currentScale * 0.8).toFixed(3));
+    // 1. Update A-Frame attributes
+    model.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+    model.setAttribute('rotation', `0 ${currentRotationY} 0`);
+
+    // 2. Direct Three.js Object3D manipulation for immediate GLTF rendering
+    if (model.object3D) {
+        model.object3D.scale.set(currentScale, currentScale, currentScale);
+        model.object3D.rotation.y = (currentRotationY * Math.PI) / 180;
+    }
+}
+
+// Zoom In / Zoom Out
+function zoomModel(direction, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
     }
 
-    model.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+    if (direction > 0) {
+        currentScale = Math.min(MAX_SCALE, +(currentScale * 1.35).toFixed(3));
+    } else {
+        currentScale = Math.max(MIN_SCALE, +(currentScale * 0.72).toFixed(3));
+    }
+
+    applyModelTransform();
 }
 
 // Rotate Volcano Left / Right
-function rotateModel(degrees) {
-    const model = document.getElementById('volcano-model');
-    if (!model) return;
+function rotateModel(degrees, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
 
     currentRotationY = (currentRotationY + degrees) % 360;
-    const currentRotation = model.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
-    model.setAttribute('rotation', `${currentRotation.x || 0} ${currentRotationY} ${currentRotation.z || 0}`);
+    applyModelTransform();
 }
 
 // Reset Model Transformation
-function resetModelTransform() {
-    const model = document.getElementById('volcano-model');
-    if (!model) return;
+function resetModelTransform(event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
 
     currentScale = 0.5;
     currentRotationY = 0;
-    model.setAttribute('scale', '0.5 0.5 0.5');
-    model.setAttribute('rotation', '0 0 0');
+    applyModelTransform();
 }
 
 
-// Keep model visible in AR scene even if camera tilts or moves during interaction
+// Keep model visible and ensure transforms stay active on every frame
 AFRAME.registerComponent('persistent-volcano', {
     init: function () {
         this.marker = this.el;
     },
     tick: function () {
-        // If user is currently exploring or model was detected and active, enforce visibility
+        // Keep marker visible if exploring
         if (isExploring && this.marker && this.marker.object3D) {
             this.marker.object3D.visible = true;
+        }
+
+        // Apply scale & rotation on every render tick so AR matrix updates don't override them
+        const model = document.getElementById('volcano-model');
+        if (model && model.object3D) {
+            model.object3D.scale.set(currentScale, currentScale, currentScale);
+            model.object3D.rotation.y = (currentRotationY * Math.PI) / 180;
         }
     }
 });
